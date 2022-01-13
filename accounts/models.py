@@ -3,6 +3,7 @@ from django.contrib.auth.models import AbstractUser
 from django.core.exceptions import ValidationError
 from django.contrib.contenttypes.fields import GenericRelation
 from accounts.constants import NonEmployeeConstants, RatingConstants
+from phonenumber_field.modelfields import PhoneNumberField
 
 
 def validate_name(value):
@@ -11,18 +12,21 @@ def validate_name(value):
     return value
   
 class Department(models.Model):
+    """Department to be used in UserDetails"""
     name = models.CharField(max_length=255, blank=True, null=True)
 
     def __str__(self):
         return str(self.name)
 
 class Designation(models.Model):
+    """Designation to be used in UserDetails"""
     name = models.CharField(max_length=100, blank=True, null=True)
 
     def __str__(self):
         return str(self.name)
 
 class TechnologyStack(models.Model):
+    """Technology stack object"""
     name = models.CharField(max_length=100, unique=True, validators=[validate_name])
 
     def __str__(self):
@@ -32,7 +36,7 @@ class User(AbstractUser):
     """Custom user model that supports email instead of username"""
 
     email = models.EmailField(max_length=255, unique=True)
-    phone_no = models.CharField(max_length=255, null=True, blank=True)
+    phone_no = PhoneNumberField(max_length=255, null=True, blank=True)
     past_experience = models.FloatField(default=0, null=True, blank=True)
     verification = models.BooleanField(default=False)
     # files = GenericRelation("FileStorage", content_type_field='content_type', object_id_field='object_id')
@@ -45,6 +49,7 @@ class User(AbstractUser):
 
 
 class UserDetails(models.Model):
+    """UserDetails object with extra fields"""
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     joining_date = models.DateField(null=True, blank=True)
     completion_date = models.DateField(null=True, blank=True)
@@ -71,6 +76,7 @@ class UserDetails(models.Model):
 
 
 class EmployeeTechnologyRating(models.Model):
+    """Intermediate table for emloyee technology rating"""
     technology_stack = models.ForeignKey(TechnologyStack, on_delete=models.CASCADE)
     user = models.ForeignKey(UserDetails, on_delete=models.CASCADE)
     rating = models.CharField(max_length=255, choices=RatingConstants.get_choices(), default=RatingConstants.AVERAGE.value)
