@@ -69,7 +69,7 @@ class LoginView(RestLoginView):
         except Exception as e:
             logger.error(
                 dict(
-                    message="error while user login",
+                    message="Error while user login",
                     class_name="LoginView",
                     request_method="POST",
                     method_name="post",
