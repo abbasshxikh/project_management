@@ -1,9 +1,9 @@
 import logging
 from django.shortcuts import render
-from accounts.models import User
+from accounts.models import User, UserDetails, Department, Designation
 from rest_framework.views import APIView
 from rest_framework import generics
-from accounts.serializers import RegistrationSerializer
+from accounts.serializers import RegistrationSerializer, UserDetailSerializer
 from rest_framework.authtoken.models import Token
 from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 from django.utils.encoding import force_bytes
@@ -23,15 +23,23 @@ logger = logging.getLogger("project_system")
 
 class RegistrationAPIView(generics.GenericAPIView):
 
-    serializer_class = RegistrationSerializer
+    serializer_class = UserDetailSerializer
 
     def post(self, request):
         try:
             serializer = self.get_serializer(data=request.data)
+            department, created = Department.objects.get_or_create(
+                name=request.data.get("department")
+            )
+            request.data.update({"department": department.id})
+            designation, created = Designation.objects.get_or_create(
+                name=request.data.get("designation")
+            )
+            request.data.update({"designation": designation.id})
             if serializer.is_valid():
                 user = serializer.save()
-                uid = urlsafe_base64_encode(force_bytes(user.pk))
-                token = Token.objects.create(user=user).key
+                uid = urlsafe_base64_encode(force_bytes(user.user))
+                token = Token.objects.create(user=user.user).key
                 return Response(
                     {
                         "Message": "Thank you for registrations in system...",

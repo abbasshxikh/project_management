@@ -36,6 +36,7 @@ class TechnologyStack(models.Model):
 class User(AbstractUser):
     """Custom user model that supports email instead of username"""
 
+    username = None
     email = models.EmailField(max_length=255, unique=True)
     contact_number = PhoneNumberField(blank=True, null=True)
     past_experience = models.FloatField(default=0, null=True, blank=True)
