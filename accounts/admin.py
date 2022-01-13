@@ -5,7 +5,7 @@ from accounts.models import (
     TechnologyStack,
     Designation,
     UserDetails,
-    EmployeeTechnologyRating
+    EmployeeTechnologyRating,
 )
 
 admin.site.register(User)
