@@ -1,3 +1,4 @@
+from enum import unique
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.core.exceptions import ValidationError
@@ -38,7 +39,7 @@ class User(AbstractUser):
 
     username = None
     email = models.EmailField(max_length=255, unique=True)
-    contact_number = PhoneNumberField(blank=True, null=True)
+    phone_number = PhoneNumberField(blank=True, null=True, unique=True)
     past_experience = models.FloatField(default=0, null=True, blank=True)
     verification = models.BooleanField(default=False)
     # files = GenericRelation("FileStorage", content_type_field='content_type', object_id_field='object_id')
