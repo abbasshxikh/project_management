@@ -14,7 +14,6 @@ from rest_framework import status
 from rest_framework.exceptions import APIException
 from rest_framework.renderers import TemplateHTMLRenderer
 from django.db import transaction
-
 # from rest_auth.views import LoginView as RestLoginView
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_auth.serializers import LoginSerializer
@@ -84,6 +83,7 @@ class RegistrationAPIView(APIView):
             )
             raise APIException(e)
 
+    
     def patch(self, request, pk, format=None):
         try:
             users = UserDetails.objects.get(id=pk)
