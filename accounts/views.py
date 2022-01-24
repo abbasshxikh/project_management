@@ -1,10 +1,16 @@
+import email
 from functools import partial
 import logging
+from re import I
 from django.shortcuts import render
 from accounts.models import User, UserDetails, Department, Designation
 from rest_framework.views import APIView
 from rest_framework import generics
-from accounts.serializers import RegistrationSerializer, UserDetailSerializer
+from accounts.serializers import (
+    RegistrationSerializer,
+    UserDetailSerializer,
+    CustomLoginSerializer,
+)
 from rest_framework.authtoken.models import Token
 from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 from django.utils.encoding import force_bytes
@@ -14,11 +20,13 @@ from rest_framework import status
 from rest_framework.exceptions import APIException
 from rest_framework.renderers import TemplateHTMLRenderer
 from django.db import transaction
+
 # from rest_auth.views import LoginView as RestLoginView
 from rest_framework.permissions import IsAuthenticated, AllowAny
-from rest_auth.serializers import LoginSerializer
 from django.contrib.auth import login
 from rest_auth.views import LoginView as RestLoginView
+from accounts.tasks.send_email_celery import send_email_id_verification_email
+from accounts.tasks.welcome_task import send_welcome_email
 
 logger = logging.getLogger("project_system")
 
@@ -60,12 +68,14 @@ class RegistrationAPIView(APIView):
             )
             if serializer.is_valid():
                 user = serializer.save()
-                uid = urlsafe_base64_encode(force_bytes(user.user))
+                uid = urlsafe_base64_encode(force_bytes(user.user.pk))
                 token = Token.objects.create(user=user.user).key
+                to_email = user.user.email
+                first_name = user.user.first_name
+                send_email_id_verification_email.delay(uid, token, first_name, to_email)
                 return Response(
                     {
-    
-                        "Message": "Thank you for registrations in system...",
+                        "Message": "Please verify your Email first....",
                         "User": serializer.data,
                         "Status": status.HTTP_201_CREATED,
                     }
@@ -83,14 +93,13 @@ class RegistrationAPIView(APIView):
             )
             raise APIException(e)
 
-    
     def patch(self, request, pk, format=None):
         try:
             users = UserDetails.objects.get(id=pk)
             serializer = UserDetailSerializer(
                 users,
-                context={"method": request.method},
                 data=request.data,
+                context={"method": request.method},
                 partial=True,
             )
             if serializer.is_valid():
@@ -138,11 +147,12 @@ class LoginView(RestLoginView):
 
     def post(self, request, *args, **kwargs):
         try:
-            serializer = LoginSerializer(
+            serializer = CustomLoginSerializer(
                 data=request.data, context={"request": request}
             )
             serializer.is_valid(raise_exception=True)
             user = serializer.validated_data["user"]
+            user.verification = True
             login(request, user)
             return super().post(request, format=None)
         except Exception as e:
@@ -152,6 +162,34 @@ class LoginView(RestLoginView):
                     class_name="LoginView",
                     request_method="POST",
                     method_name="post",
+                    errors=e,
+                )
+            )
+            raise APIException(e)
+
+
+class EmailValidate(APIView):
+    def get(self, request, uidb64, token):
+        try:
+            uid = force_text(urlsafe_base64_decode(uidb64))
+            user = User.objects.get(pk=uid)
+            if user and Token.objects.get(user=user.id):
+                user.verification = True
+                user.save()
+                user_first_name = user.first_name
+                to_email = user.email
+                send_welcome_email.delay(user_first_name, to_email)
+                return Response(
+                    {"Message": "Thank you For verifying your email address"}
+                )
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            logger.error(
+                dict(
+                    message="Error while validating user email",
+                    class_name="EmailValidate",
+                    request_method="GET",
+                    method_name="get",
                     errors=e,
                 )
             )

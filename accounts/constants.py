@@ -1,4 +1,23 @@
 from enum import Enum
+from django.contrib.sites.models import Site
+
+current_site = Site.objects.get_current()
+
+SITE_URL = current_site.domain
+
+
+EMAIL_VERIFY_MESSAGE = {
+    "subject": "Please confirm your email",
+    "title": "Hello, FirstName,",
+    "body": f"\nWe need to confirm that it's you,\n{SITE_URL}/accounts/activate/UID/TOKEN/ \nIf you did not register an account with us, please ignore or delete this email",
+    "footer": "\nThank you",
+}
+
+SUCCESS_REGISTRATION_MESSAGE = {
+    "subject": "Welcome to Project Management System",
+    "title": "Hello, FirstName,",
+    "body": f"\nWelcome to Project Management System,\n{SITE_URL}/accounts/login/ \nThank you",
+}
 
 
 class ConstantHelper:

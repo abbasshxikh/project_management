@@ -2,8 +2,9 @@ from django.contrib.contenttypes import fields
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 from .models import User, Department, Designation, TechnologyStack, UserDetails
-
-# from rest_auth.serializers import LoginSerializer
+from rest_framework.validators import UniqueValidator
+from phonenumber_field.serializerfields import PhoneNumberField
+from rest_auth.serializers import LoginSerializer
 
 
 class DepartmentSerializer(serializers.ModelSerializer):
@@ -26,9 +27,23 @@ class DesignationSerializer(serializers.ModelSerializer):
 
 class RegistrationSerializer(serializers.ModelSerializer):
 
-    email = serializers.EmailField(max_length=50, min_length=6)
+    email = serializers.EmailField(
+        validators=[
+            UniqueValidator(
+                queryset=User.objects.all(),
+                message="This email is already register by user.",
+            )
+        ]
+    )
     password = serializers.CharField(max_length=150, write_only=True)
-
+    # phone_number = PhoneNumberField(
+    #     validators=[
+    #         UniqueValidator(
+    #             queryset=User.objects.all(),
+    #             message="This Phone number is already register by user.",
+    #         )
+    #     ]
+    # )
     class Meta:
         model = User
         fields = (
@@ -41,11 +56,18 @@ class RegistrationSerializer(serializers.ModelSerializer):
             "password",
         )
 
-    def validate(self, args):
-        email = args.get("email", None)
-        if User.objects.filter(email=email).exists():
-            raise serializers.ValidationError({"email": ("email already exists")})
-        return super().validate(args)
+    # def validate(self, args):
+    #     email = args.get("email", None)
+    #     if User.objects.filter(email=email).exists():
+    #         raise serializers.ValidationError({"email": ("email already exists")})
+    #     return super().validate(args)
+
+    # def validate_email(self, email):
+    #     if self.context.get("is_create"):
+    #         if email:
+    #             if User.objects.filter(email=email).exists():
+    #                 raise serializers.ValidationError({"email": ("email already exists")})
+    #     return email
 
 
 class TechnologyStackSerializer(serializers.ModelSerializer):
@@ -73,7 +95,6 @@ class UserDetailSerializer(serializers.ModelSerializer):
         user_obj = User.objects.create(**user)
         user_obj.set_password(user["password"])
         user_obj.save()
-
         user_details = UserDetails.objects.create(user=user_obj, **validated_data)
         user_details.technology_stack.set(technology_stack)
         return user_details
@@ -88,6 +109,7 @@ class UserDetailSerializer(serializers.ModelSerializer):
 
     def update(self, instance, validated_data):
         user = validated_data.get("user")
+        validated_data.pop("email", None)
         instance.user.first_name = user.get("first_name")
         instance.user.last_name = user.get("last_name")
         instance.user.past_experience = user.get("past_experience")
@@ -104,3 +126,13 @@ class UserDetailSerializer(serializers.ModelSerializer):
         )
         instance.save()
         return instance
+
+
+class CustomLoginSerializer(LoginSerializer):
+    def validate(self, attrs):
+        attrs = super().validate(attrs)
+        if attrs.get("user").verification:
+            return attrs
+        raise serializers.ValidationError(
+            {"email": "Please verify your email to login"}
+        )

@@ -37,9 +37,9 @@ class TechnologyStack(models.Model):
 class User(AbstractUser):
     """Custom user model that supports email instead of username"""
 
-    username = None
+    username = models.CharField(max_length=255, null=True, blank=True)
     email = models.EmailField(max_length=255, unique=True)
-    phone_number = PhoneNumberField(blank=True, null=True, unique=True)
+    phone_number = PhoneNumberField(max_length=255, null=True, blank=True)
     past_experience = models.FloatField(default=0, null=True, blank=True)
     verification = models.BooleanField(default=False)
     # files = GenericRelation("FileStorage", content_type_field='content_type', object_id_field='object_id')

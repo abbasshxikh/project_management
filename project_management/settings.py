@@ -16,6 +16,8 @@ import datetime
 from pathlib import Path
 
 
+# CELERY_BROKER_URL = 'amqp://guest:guest@localhost'
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 env = environ.Env()
@@ -30,7 +32,7 @@ SECRET_KEY = "django-insecure-go00je+2kq+_wyl-^5fty3z5c$hev#kr@p975-h034w&9!p4ew
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["*"]
 
 
 # Application definition
@@ -42,12 +44,20 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "django.contrib.sites",
     "accounts",
     "rest_framework",
     "rest_framework.authtoken",
     "rest_auth",
     "phonenumber_field",
 ]
+
+
+# BROKER_URL = 'amqp://guest:guest@localhost:5672//'
+CELERY_BROKER_URL = "redis://localhost:6379"
+CELERY_RESULT_BACKEND = "redis://localhost:6379"
+
+SITE_ID = 1
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
@@ -132,6 +142,17 @@ LOGGING = {
     },
 }
 
+REST_AUTH_SERIALIZERS = {
+    "LOGIN_SERIALIZER": "accounts.serializers.CustomLoginSerializer",
+}
+
+
+EMAIL_BACKEND = env("EMAIL_BACKEND")
+EMAIL_HOST = env("EMAIL_HOST")
+EMAIL_PORT = env("EMAIL_PORT")
+EMAIL_HOST_USER = env("EMAIL_HOST_USER")
+EMAIL_HOST_PASSWORD = env("EMAIL_HOST_PASSWORD")
+EMAIL_USE_TLS = True
 
 # Password validation
 # https://docs.djangoproject.com/en/4.0/ref/settings/#auth-password-validators
