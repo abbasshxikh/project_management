@@ -1,137 +1,56 @@
-{% load rest_framework %}
-<!DOCTYPE html>
-<html lang="en">
-
-<!-- auth-register.html  Tue, 07 Jan 2020 03:39:47 GMT -->
+<html>   
 <head>
-<meta charset="UTF-8">
-<meta content="width=device-width, initial-scale=1, maximum-scale=1, shrink-to-fit=no" name="viewport">
-<title>Register &mdash; CodiePie</title>
-
-<!-- General CSS Files -->
-<link rel="stylesheet" href="assets/modules/bootstrap/css/bootstrap.min.css">
-<link rel="stylesheet" href="assets/modules/fontawesome/css/all.min.css">
-
-<!-- CSS Libraries -->
-<link rel="stylesheet" href="assets/modules/jquery-selectric/selectric.css">
-
-<!-- Template CSS -->
-<link rel="stylesheet" href="assets/css/style.min.css">
-<link rel="stylesheet" href="assets/css/components.min.css">
+ <title>Bootstrap Login Form | Web Dev Trick</title>
+ <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+ <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+ <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.1/css/all.css" integrity="sha384-gfdkjb5BdAXd+lj+gudLWI+BXq4IuLW5IT+brZEZsLFm++aCMlF1V92rMkPaX4PP" crossorigin="anonymous">
+ <link rel="stylesheet" href="project_m_system/project_management/static/CSS/style.css">
 </head>
-
-<body class="layout-4">
-
-<div id="app">
-    <section class="section">
-        <div class="container mt-5">
-            <div class="row">
-                <div class="col-12 col-sm-10 offset-sm-1 col-md-8 offset-md-2 col-lg-8 offset-lg-2 col-xl-8 offset-xl-2">
-                    <div class="login-brand">
-                        <img src="http://puffintheme.com/craft/codiepie/dist/assets/img/CodiePie-fill.svg" alt="logo" width="100" class="shadow-light rounded-circle">
-                    </div>
-                    <div class="card card-primary">
-                        <div class="card-header">
-                            <h4>Register</h4>
-                        </div>
-                        <div class="card-body">
-                            <form action={% url 'register' %}"  method="POST">
-                                <div class="row">
-                                    <div class="form-group col-6">
-                                        <label for="frist_name">First Name</label>
-                                        <input id="frist_name" type="text" class="form-control" name="frist_name" autofocus>
-                                    </div>
-                                    <div class="form-group col-6">
-                                        <label for="last_name">Last Name</label>
-                                        <input id="last_name" type="text" class="form-control" name="last_name">
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    <label for="email">Email</label>
-                                    <input id="email" type="email" class="form-control" name="email">
-                                    <div class="invalid-feedback">
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="form-group col-6">
-                                        <label for="password" class="d-block">Password</label>
-                                        <input id="password" type="password" class="form-control pwstrength" data-indicator="pwindicator" name="password">
-                                        <div id="pwindicator" class="pwindicator">
-                                            <div class="bar"></div>
-                                            <div class="label"></div>
-                                        </div>
-                                    </div>
-                                    <div class="form-group col-6">
-                                        <label for="password2" class="d-block">Password Confirmation</label>
-                                        <input id="password2" type="password" class="form-control" name="password-confirm">
-                                    </div>
-                                </div>
-                                <div class="form-divider">Your Home</div>
-                                <div class="row">
-                                    <div class="form-group col-6">
-                                        <label>Country</label>
-                                        <select class="form-control selectric">
-                                            <option>USA</option>
-                                            <option>Palestine</option>
-                                            <option>Syria</option>
-                                            <option>Malaysia</option>
-                                            <option>Thailand</option>
-                                        </select>
-                                    </div>
-                                    <div class="form-group col-6">
-                                        <label>Province</label>
-                                        <select class="form-control selectric">
-                                            <option>West Java</option>
-                                            <option>East Java</option>
-                                        </select>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="form-group col-6">
-                                        <label>City</label>
-                                        <input type="text" class="form-control">
-                                    </div>
-                                    <div class="form-group col-6">
-                                        <label>Postal Code</label>
-                                        <input type="text" class="form-control">
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    <div class="custom-control custom-checkbox">
-                                        <input type="checkbox" name="agree" class="custom-control-input" id="agree">
-                                        <label class="custom-control-label" for="agree">I agree with the terms and conditions</label>
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    <button type="submit" class="btn btn-primary btn-lg btn-block">Register</button>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                    <div class="simple-footer">
-                        Copyright &copy; CodiePie 2020
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-</div>
-
-<!-- General JS Scripts -->
-<script src="assets/bundles/lib.vendor.bundle.js"></script>
-<script src="js/CodiePie.js"></script>
-
-<!-- JS Libraies -->
-<script src="assets/modules/jquery-pwstrength/jquery.pwstrength.min.js"></script>
-<script src="assets/modules/jquery-selectric/jquery.selectric.min.js"></script>
-
-<!-- Page Specific JS File -->
-<script src="js/page/auth-register.js"></script>
-
-<!-- Template JS File -->
-<script src="js/scripts.js"></script>
-<script src="js/custom.js"></script>
+<body>
+ <div class="container h-100">
+ <div class="d-flex justify-content-center h-100">
+ <div class="user_card">
+ <div class="d-flex justify-content-center">
+ <div class="brand_logo_container">
+     <h1>Login Here</h1>
+ {% comment %} <img src="https://webdevtrick.com/wp-content/uploads/logo-fb.png" class="brand_logo" alt="Logo"> {% endcomment %}
+ </div>
+ </div>
+ <div class="d-flex justify-content-center form_container">
+ <form>
+ <div class="input-group mb-3">
+ <div class="input-group-append">
+ <span class="input-group-text"><i class="fas fa-user"></i></span>
+ </div>
+ <input type="text" name="" class="form-control input_user" value="" placeholder="username or email">
+ </div>
+ <div class="input-group mb-2">
+ <div class="input-group-append">
+ <span class="input-group-text"><i class="fas fa-key"></i></span>
+ </div>
+ <input type="password" name="" class="form-control input_pass" value="" placeholder="password">
+ </div>
+ <div class="form-group">
+ <div class="custom-control custom-checkbox">
+ <input type="checkbox" class="custom-control-input" id="customControlInline">
+ <label class="custom-control-label" for="customControlInline">Remember Password</label>
+ </div>
+ </div>
+ </form>
+ </div>
+ <div class="d-flex justify-content-center mt-3 login_container">
+ <button type="button" name="button" class="btn login_btn">Login</button>
+ </div>
+ <div class="mt-4">
+ <div class="d-flex justify-content-center links">
+ Don't have an account? <a href="https://webdevtrick.com" class="ml-2">Sign Up</a>
+ </div>
+ <div class="d-flex justify-content-center links">
+ <a href="#">Forgot your password?</a>
+ </div>
+ </div>
+ </div>
+ </div>
+ </div>
 </body>
-
-<!-- auth-register.html  Tue, 07 Jan 2020 03:39:48 GMT -->
 </html>

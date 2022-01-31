@@ -34,7 +34,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = ["*"]
 
-
+AUTHENTICATION_BACKENDS = ["django.contrib.auth.backends.AllowAllUsersModelBackend"]
 # Application definition
 
 INSTALLED_APPS = [
@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     "rest_framework.authtoken",
     "rest_auth",
     "phonenumber_field",
+    "django_rest_passwordreset",
 ]
 
 
@@ -144,6 +145,7 @@ LOGGING = {
 
 REST_AUTH_SERIALIZERS = {
     "LOGIN_SERIALIZER": "accounts.serializers.CustomLoginSerializer",
+    "PASSWORD_RESET_SERIALIZER": "accounts.serializers.CustomPasswordResetSerializer",
 }
 
 
@@ -188,7 +190,7 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.0/howto/static-files/
 
-STATIC_URL = "static/"
+STATIC_URL = "/static/"
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field

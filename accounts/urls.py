@@ -4,6 +4,8 @@ from accounts.views import (
     LoginView,
     DepartmentApiView,
     EmailValidate,
+    CustomPasswordResetView,
+    CustomPasswordResetConfirmView,
 )
 
 
@@ -13,4 +15,10 @@ urlpatterns = [
     path("login/", LoginView.as_view(), name="login"),
     path("activate/<uidb64>/<token>/", EmailValidate.as_view(), name="activate"),
     path("dept/", DepartmentApiView.as_view(), name="deptarment"),
+    path("password/reset/", CustomPasswordResetView.as_view(), name="password_reset"),
+    path(
+        "password/reset/confirm/<uidb64>/<token>/",
+        CustomPasswordResetConfirmView().as_view(),
+        name="password_reset_confirm",
+    ),
 ]

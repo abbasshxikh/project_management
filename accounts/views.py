@@ -11,6 +11,7 @@ from accounts.serializers import (
     UserDetailSerializer,
     CustomLoginSerializer,
 )
+from rest_auth.views import PasswordResetView, PasswordResetConfirmView
 from rest_framework.authtoken.models import Token
 from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 from django.utils.encoding import force_bytes
@@ -27,14 +28,25 @@ from django.contrib.auth import login
 from rest_auth.views import LoginView as RestLoginView
 from accounts.tasks.send_email_celery import send_email_id_verification_email
 from accounts.tasks.welcome_task import send_welcome_email
+from accounts.services.error_message import ErrorMessage
 
 logger = logging.getLogger("project_system")
+
+
+class MyHTMLRenderer(TemplateHTMLRenderer):
+    def get_template_context(self, *args, **kwargs):
+        context = super().get_template_context(*args, **kwargs)
+        if isinstance(context, list):
+            context = {"items": context}
+        return context
 
 
 class RegistrationAPIView(APIView):
     # renderer_classes = [TemplateHTMLRenderer]
     # template_name = 'register.html'
     # serializer_class = UserDetailSerializer
+    # renderer_classes = [MyHTMLRenderer]
+    # template_name = "index.html"
 
     def get(self, request, pk=None):
         try:
@@ -95,9 +107,9 @@ class RegistrationAPIView(APIView):
 
     def patch(self, request, pk, format=None):
         try:
-            users = UserDetails.objects.get(id=pk)
+            user = UserDetails.objects.get(id=pk)
             serializer = UserDetailSerializer(
-                users,
+                user,
                 data=request.data,
                 context={"method": request.method},
                 partial=True,
@@ -146,26 +158,27 @@ class LoginView(RestLoginView):
     permission_classes = (AllowAny,)
 
     def post(self, request, *args, **kwargs):
-        try:
-            serializer = CustomLoginSerializer(
-                data=request.data, context={"request": request}
-            )
-            serializer.is_valid(raise_exception=True)
-            user = serializer.validated_data["user"]
-            user.verification = True
-            login(request, user)
-            return super().post(request, format=None)
-        except Exception as e:
-            logger.error(
-                dict(
-                    message="Error while User Login",
-                    class_name="LoginView",
-                    request_method="POST",
-                    method_name="post",
-                    errors=e,
-                )
-            )
-            raise APIException(e)
+        # try:
+        serializer = CustomLoginSerializer(
+            data=request.data, context={"request": request}
+        )
+        serializer.is_valid(raise_exception=True)
+        user = serializer.validated_data["user"]
+        user.verification = True
+        login(request, user)
+        return super().post(request, format=None)
+
+    # except Exception as e:
+    #     logger.error(
+    #         dict(
+    #             message="Error while User Login",
+    #             class_name="LoginView",
+    #             request_method="POST",
+    #             method_name="post",
+    #             errors=e,
+    #         )
+    #     )
+    #     raise APIException(e)
 
 
 class EmailValidate(APIView):
@@ -197,9 +210,41 @@ class EmailValidate(APIView):
 
 
 class DepartmentApiView(APIView):
-    renderer_classes = [TemplateHTMLRenderer]
-    template_name = "dept_list.html"
+    # renderer_classes = [TemplateHTMLRenderer]
+    # template_name = "dept_list.html"
 
     def get(self, request):
         queryset = Department.objects.all()
         return Response({"profiles": queryset})
+
+
+class CustomPasswordResetView(PasswordResetView):
+    """override rest-auth password reset view"""
+
+    def post(self, request, *args, **kwargs):
+
+        serializer = self.get_serializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(
+                {
+                    "Message": "Password reset email has been sent",
+                }
+            )
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class CustomPasswordResetConfirmView(PasswordResetConfirmView):
+    """override rest-auth password reset confirm view"""
+
+    def post(self, request, *args, **kwargs):
+
+        serializer = self.get_serializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(
+                {
+                    "Message": "Password updated successfully",
+                }
+            )
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

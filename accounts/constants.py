@@ -19,6 +19,13 @@ SUCCESS_REGISTRATION_MESSAGE = {
     "body": f"\nWelcome to Project Management System,\n{SITE_URL}/accounts/login/ \nThank you",
 }
 
+PASSWORD_RESET_EMAIL_MESSAGE = {
+    "header": "Hello, ",
+    "body": "We need to confirm that it's you,",
+    "footer1": "If you did not request to reset your password, please ignore or delete this email",
+    "footer": "Thank you",
+}
+
 
 class ConstantHelper:
     """return the constant value"""
