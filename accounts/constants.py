@@ -1,6 +1,12 @@
 from enum import Enum
 
 
+SUCCESS_REGISTRATION_MESSAGE = {
+        "subject": "Welcome to Project Management System",
+        "title": "Hello, FirstName,",
+        "body": "\nWelcome to Project Management System,\ncurrent_site/accounts/login/ \nThank you",
+    }
+
 class ConstantHelper:
     """ return the constant value """
     @classmethod

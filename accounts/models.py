@@ -4,6 +4,7 @@ from django.core.exceptions import ValidationError
 from django.contrib.contenttypes.fields import GenericRelation
 from accounts.constants import NonEmployeeConstants, RatingConstants
 from phonenumber_field.modelfields import PhoneNumberField
+from rest_framework_simplejwt.tokens import RefreshToken
 
 
 def validate_name(value):
@@ -35,6 +36,7 @@ class TechnologyStack(models.Model):
 class User(AbstractUser):
     """Custom user model that supports email instead of username"""
 
+    username = models.CharField(max_length=255, blank=True, null=True)
     email = models.EmailField(max_length=255, unique=True)
     phone_no = PhoneNumberField(max_length=255, null=True, blank=True)
     past_experience = models.FloatField(default=0, null=True, blank=True)
@@ -47,6 +49,13 @@ class User(AbstractUser):
     def __str__(self):
         return str(self.email)
 
+    def tokens(self):
+        """Method for returning two tokens for the current user"""
+        refresh = RefreshToken.for_user(self)
+        return {
+            "refresh": str(refresh),
+            "access": str(refresh.access_token)
+        }
 
 class UserDetails(models.Model):
     """UserDetails object with extra fields"""
