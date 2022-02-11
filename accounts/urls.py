@@ -6,7 +6,8 @@ from accounts.views import (
     LoginAPIView, 
     PasswordTokenCheckAPIView, 
     RequestPasswordResetAPIView, 
-    SetNewPasswordAPIView
+    SetNewPasswordAPIView,
+
 )
 from rest_framework_simplejwt.views import (
     TokenObtainPairView,

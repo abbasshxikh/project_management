@@ -53,7 +53,8 @@ INSTALLED_APPS = [
     'drf_api_logger',
     'drf_yasg',
     'rest_auth',
-    'rest_framework_simplejwt.token_blacklist'
+    'rest_framework_simplejwt.token_blacklist',
+    'razorpay_app',
 ]
 
 MIDDLEWARE = [
