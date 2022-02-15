@@ -1,0 +1,115 @@
+version: "3.3"
+
+services:
+  redis_server:
+    image: redis
+    # environment:
+    #   - CELERY_BROKER=redis://redis:6379/0
+    #   - CELERY_BACKEND=redis://redis:6379/0
+    # ports:
+    #   - '6379:6379'
+    # networks:
+    #   - live
+    expose:
+      - 6379
+    # command: redis-server
+  db:
+    image: postgres
+    restart: always
+    environment:
+      - POSTGRES_DB=project_systems
+      - POSTGRES_USER=nimesh
+      - POSTGRES_PASSWORD=postgres
+    expose:
+      - 5432
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    depends_on:
+      - redis_server
+
+  web:
+    build: .
+    ports:
+      - 8000:8000
+    volumes:
+      - .:/app
+    command: >
+      sh -c "python manage.py migrate &&,
+             python manage.py runserver 0.0.0.0:8000"
+    environment:
+      - DEBUG=1
+      # - DJANGO_ALLOWED_HOSTS=localhost 127.0.0.1 [::1]
+    depends_on:
+      - db
+      # - redis_server
+
+  worker:
+    restart: always
+    container_name: accounts-celery
+    build:
+      context: .
+    hostname: worker
+    entrypoint: celery
+    command: -A project_management.celery_config.celery_app worker -l info
+    environment:
+      - DEBUG=1
+      # - DJANGO_ALLOWED_HOSTS=localhost 127.0.0.1 [::1]
+      - CELERY_BROKER=redis://redis:6379/0
+      - CELERY_BACKEND=redis://redis:6379/0
+    depends_on:
+      - web
+      - redis_server
+    # environment:
+    #   C_FORCE_ROOT: "true"
+
+
+volumes:
+  postgres_data:
+
+# networks:
+  # live:
+# version: "3.3"
+
+# services:
+#   db:
+#     image: postgres
+#     restart: always
+#     # container_name: e_comm_db
+#     environment:
+#       - POSTGRES_DB=e_commerce_db
+#       - POSTGRES_USER=postgres
+#       - POSTGRES_PASSWORD=postgres
+#     expose:
+#       - 5432
+#     volumes:
+#       - postgres_data:/var/lib/postgresql/data/
+#     network_mode: "host"
+#     # networks:
+#     #           - djangonetwork
+
+
+#   web:
+#     build: .
+#     ports:
+#       - 8000:8000
+#     restart: always
+#     volumes:
+#       - .:/app
+#     command: >
+#       sh -c "python manage.py wait_for_db && ,
+#              python manage.py migrate &&,
+#              python manage.py runserver 0.0.0.0:8001"
+#     depends_on:
+#       - db
+#     environment:
+#       - C_FORCE_ROOT:'true'
+#     # networks:
+#     #           - djangonetwork
+
+# # networks:
+# #       djangonetwork:
+# #           driver: bridge
+# volumes:
+#   postgres_data:
+
+

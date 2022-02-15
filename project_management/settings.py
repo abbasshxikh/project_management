@@ -54,7 +54,7 @@ INSTALLED_APPS = [
 ]
 
 
-# BROKER_URL = 'amqp://guest:guest@localhost:5672//'
+# BROKER_URL = 'amqp://guest:guest@/0localhost:5672//'
 CELERY_BROKER_URL = "redis://localhost:6379"
 CELERY_RESULT_BACKEND = "redis://localhost:6379"
 
@@ -106,13 +106,26 @@ JWT_AUTH = {"JWT_EXPIRATION_DELTA": datetime.timedelta(days=365)}
 DATABASES = {
     "default": {
         "ENGINE": env("DB_ENGINE"),
-        "NAME": env("DB_NAME"),
-        "USER": env("DB_USER"),
-        "PASSWORD": env("DB_PASSWORD"),
+        "NAME": env("POSTGRES_DB"),
+        "USER": env("POSTGRES_USER"),
+        "PASSWORD": env("POSTGRES_PASSWORD"),
         "HOST": env("DB_HOST"),
         "PORT": env("DB_PORT"),
     }
 }
+
+# DATABASES = {
+#     "default": {
+#         "ENGINE":"django.db.backends.postgresql_psycopg2",
+#         "NAME":"project_systems",
+#         "USER":"nimesh",
+#         "PASSWORD":"postgres",
+#         "HOST":"db",
+#         "PORT": 5432,
+#     }
+# }
+
+
 
 LOGS_PATH = f"{BASE_DIR}/.logs/logfile.log"
 os.makedirs(f"{BASE_DIR}/.logs/", exist_ok=True)
