@@ -38,7 +38,6 @@ class PaymentSuccessView(APIView):
 
     def post(self, request):
         response = request.POST
-        print(response)
 
         # We need to check authenticity of the details by verifying the signature
         params_dict = {
@@ -51,15 +50,14 @@ class PaymentSuccessView(APIView):
         client = razorpay.Client(auth=("rzp_test_uLDbIUhZ5cnD4y", "VV4oxwreajBdOAfnRKkvFYAm"))
 
         try:
-            # call the utility.verify api to verify the signature status True or False 
+            # call the utility.verify api to verify the signature status
             status = client.utility.verify_payment_signature(params_dict)
             user = models.Payment.objects.get(order_id=response["razorpay_order_id"])
             user.razorpay_payment_id = response["razorpay_payment_id"]
             user.paid = True
             user.save()
-
             to_email = user.email
-            name = user.name
+            name = user.name.split(" ")[0]
             current_site = get_domain(request)
             send_payment_success_email.delay(to_email, name, current_site)
             return Response({"status": True}, template_name="payments/payment_status.html")
